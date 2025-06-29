@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(CLIENT)
+  priority  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  devices  Device[]
+  requests Request[]
+
+  @@map("users")
+}
+
+model DeviceModel {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  priority    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  imageUrl  String?
+
+  // Relations
+  devices Device[]
+
+  @@map("device_models")
+}
+
+model Device {
+  id           String        @id @default(cuid())
+  serialNumber String        @unique
+  status       DeviceStatus  @default(ACTIVE)
+  userId       String
+  modelId      String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model        DeviceModel   @relation(fields: [modelId], references: [id])
+  requests     Request[]
+  replacedBy   Device?       @relation("DeviceReplacement", fields: [replacedById], references: [id])
+  replaces     Device[]      @relation("DeviceReplacement")
+  replacedById String?
+
+  @@map("devices")
+}
+
+model Request {
+  id              String       @id @default(cuid())
+  type            RequestType
+  status          RequestStatus @default(NEW)
+  reason          String
+  quantity        Int?
+  newSerialNumber String?
+  adminComment    String?
+  attachmentUrl   String?       // <--- Добавь вот эту строку
+  deviceId        String?
+  device          Device?       @relation(fields: [deviceId], references: [id])
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  priority        Int?
+  replacementRequested Boolean? @default(false)
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+enum DeviceStatus {
+  ACTIVE
+  REPLACED
+  RETIRED
+}
+
+enum RequestType {
+  REPAIR
+  REPLACEMENT
+  ORDER
+}
+
+enum RequestStatus {
+  NEW
+  IN_REVIEW
+  DECLINED
+  IN_DELIVERY
+  SENT
+  COMPLETED
+}
