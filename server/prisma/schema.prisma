@@ -34,7 +34,6 @@ model DeviceModel {
   updatedAt   DateTime @updatedAt
   imageUrl  String?
 
-  // Relations
   devices Device[]
 
   @@map("device_models")
@@ -49,7 +48,6 @@ model Device {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   model        DeviceModel   @relation(fields: [modelId], references: [id])
   requests     Request[]

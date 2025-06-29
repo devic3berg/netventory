@@ -217,8 +217,6 @@ async function main() {
     }
   }
 
-  console.log(`✅ Created ${createdDevices.length} devices`);
-
   const requestTypes: ('REPAIR' | 'REPLACEMENT' | 'ORDER')[] = ['REPAIR', 'REPLACEMENT', 'ORDER'];
   const requestStatuses: ('NEW' | 'IN_REVIEW' | 'DECLINED' | 'IN_DELIVERY' | 'SENT' | 'COMPLETED')[] = ['NEW', 'IN_REVIEW', 'DECLINED', 'IN_DELIVERY', 'SENT', 'COMPLETED'];
   
